@@ -8,7 +8,7 @@ import android.os.Message;
 
 import com.test.yysleep.bluttoothtransmission.constant.BluetoothConstant;
 import com.test.yysleep.bluttoothtransmission.constant.Constant;
-import com.test.yysleep.bluttoothtransmission.sys.BluetoothSys;
+import com.test.yysleep.bluttoothtransmission.tool.sys.BluetoothSys;
 import com.test.yysleep.bluttoothtransmission.util.LogUtil;
 
 import java.io.BufferedInputStream;

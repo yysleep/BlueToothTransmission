@@ -7,7 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 
 import com.test.yysleep.bluttoothtransmission.R;
-import com.test.yysleep.bluttoothtransmission.sys.PermissionSys;
+import com.test.yysleep.bluttoothtransmission.tool.sys.PermissionSys;
 import com.test.yysleep.bluttoothtransmission.util.LogUtil;
 import com.test.yysleep.bluttoothtransmission.util.ToastUtil;
 

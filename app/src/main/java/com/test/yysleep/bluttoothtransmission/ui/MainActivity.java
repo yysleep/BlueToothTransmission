@@ -10,7 +10,7 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.test.yysleep.bluttoothtransmission.R;
-import com.test.yysleep.bluttoothtransmission.sys.PermissionSys;
+import com.test.yysleep.bluttoothtransmission.tool.sys.PermissionSys;
 import com.test.yysleep.bluttoothtransmission.ui.bluetooth.BlueToothActivity;
 import com.test.yysleep.bluttoothtransmission.util.FileLogUtil;
 import com.test.yysleep.bluttoothtransmission.util.LogUtil;

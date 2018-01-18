@@ -24,7 +24,7 @@ import android.widget.TextView;
 import com.test.yysleep.bluttoothtransmission.constant.BluetoothConstant;
 import com.test.yysleep.bluttoothtransmission.R;
 import com.test.yysleep.bluttoothtransmission.service.BluetoothTransportService;
-import com.test.yysleep.bluttoothtransmission.sys.BluetoothSys;
+import com.test.yysleep.bluttoothtransmission.tool.sys.BluetoothSys;
 import com.test.yysleep.bluttoothtransmission.tool.adapter.BlueToothBondDevicesAdapter;
 import com.test.yysleep.bluttoothtransmission.tool.adapter.BlueToothDevicesAdapter;
 import com.test.yysleep.bluttoothtransmission.ui.base.BaseActivity;

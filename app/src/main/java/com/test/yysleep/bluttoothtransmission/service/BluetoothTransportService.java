@@ -1,6 +1,5 @@
 package com.test.yysleep.bluttoothtransmission.service;
 
-import android.app.IntentService;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Handler;
@@ -8,9 +7,8 @@ import android.os.IBinder;
 import android.os.Message;
 import android.support.annotation.Nullable;
 
-import com.test.yysleep.bluttoothtransmission.R;
 import com.test.yysleep.bluttoothtransmission.constant.BluetoothConstant;
-import com.test.yysleep.bluttoothtransmission.sys.NotificationSys;
+import com.test.yysleep.bluttoothtransmission.tool.sys.NotificationSys;
 import com.test.yysleep.bluttoothtransmission.tool.thread.bluetooth.BlueToothAcceptFileThread;
 import com.test.yysleep.bluttoothtransmission.tool.thread.bluetooth.BlueToothSendFileThread;
 import com.test.yysleep.bluttoothtransmission.util.ToastUtil;

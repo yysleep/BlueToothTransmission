@@ -2,7 +2,7 @@ package com.test.yysleep.bluttoothtransmission;
 
 import android.app.Application;
 
-import com.test.yysleep.bluttoothtransmission.sys.BluetoothSys;
+import com.test.yysleep.bluttoothtransmission.tool.sys.BluetoothSys;
 
 /**
  * Created by YySleep on 2018/1/17.
