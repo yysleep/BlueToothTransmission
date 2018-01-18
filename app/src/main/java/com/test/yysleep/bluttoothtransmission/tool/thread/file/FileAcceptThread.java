@@ -1,15 +1,13 @@
 package com.test.yysleep.bluttoothtransmission.tool.thread.file;
 
 import android.bluetooth.BluetoothSocket;
-import android.os.Environment;
 
-import com.test.yysleep.bluttoothtransmission.Constant;
+import com.test.yysleep.bluttoothtransmission.constant.Constant;
 import com.test.yysleep.bluttoothtransmission.util.LogUtil;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;

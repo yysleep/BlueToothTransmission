@@ -3,12 +3,12 @@ package com.test.yysleep.bluttoothtransmission.tool.thread.bluetooth;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
-import android.os.Environment;
+import android.os.Handler;
 import android.os.Message;
 
-import com.test.yysleep.bluttoothtransmission.Constant;
-import com.test.yysleep.bluttoothtransmission.tool.thread.file.FileSendThread;
-import com.test.yysleep.bluttoothtransmission.ui.bluetooth.BlueToothActivity;
+import com.test.yysleep.bluttoothtransmission.constant.BluetoothConstant;
+import com.test.yysleep.bluttoothtransmission.constant.Constant;
+import com.test.yysleep.bluttoothtransmission.sys.BluetoothSys;
 import com.test.yysleep.bluttoothtransmission.util.LogUtil;
 
 import java.io.BufferedInputStream;
@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Handler;
 
 /**
  * Created by Administrator on 2018/1/17.
@@ -27,33 +26,37 @@ import java.util.logging.Handler;
  * @author yysleep
  */
 
-public class BlueToothConnectThread extends Thread {
+public class BlueToothSendFileThread extends Thread {
 
-    private final static String TAG = "BlueToothConnectThread";
+    private final static String TAG = "BlueToothSendFileThread";
     private final BluetoothSocket mSocket;
     private final BluetoothDevice mDevice;
     private BluetoothAdapter mBluetoothAdapter;
-    private BluetoothHandler mHandler;
+    private Handler mHandler;
     private List<String> mFiles;
 
-    public BlueToothConnectThread(BluetoothAdapter adapter, BluetoothDevice device) {
+    public BlueToothSendFileThread(Handler handler) {
         // Use a temporary object that is later assigned to mSocket,
         // because mSocket is final
         BluetoothSocket tmp = null;
-        mDevice = device;
-        mBluetoothAdapter = adapter;
+        mDevice = BluetoothSys.getInstance().getDevice();
+        mBluetoothAdapter = BluetoothSys.getInstance().getBlueToothAdapter();
+        mHandler = handler;
 
         // Get a BluetoothSocket to connect with the given BluetoothDevice
         try {
             // MY_UUID is the app's UUID string, also used by the server code
-            tmp = device.createRfcommSocketToServiceRecord(Constant.MY_UUID);
-        } catch (IOException e) {
+            tmp = mDevice.createRfcommSocketToServiceRecord(BluetoothConstant.MY_UUID);
+        } catch (Exception e) {
             e.printStackTrace();
         }
         mSocket = tmp;
     }
 
     public void run() {
+        if (mDevice == null || mSocket == null) {
+            return;
+        }
         // Cancel discovery because it will slow down the connection
         mBluetoothAdapter.cancelDiscovery();
         LogUtil.d(TAG, "[run] mSocket = " + mSocket);
@@ -103,6 +106,8 @@ public class BlueToothConnectThread extends Thread {
             if (!file.exists()) {
                 continue;
             }
+            long fileSize = file.length();
+            long sendSize = 0;
             try {
                 byte[] bytes = new byte[1024];
                 int len = 0;
@@ -111,6 +116,11 @@ public class BlueToothConnectThread extends Thread {
                 while ((len = buffIn.read(bytes)) != -1) {
                     buffOut.write(bytes, 0, len);
                     buffOut.flush();
+                    sendSize = len + sendSize;
+                    Message msg = Message.obtain();
+                    msg.what = BluetoothConstant.MESSAGE_UPDATE_SEND_NOTIFICATION;
+                    msg.obj = (float) (sendSize / fileSize);
+                    mHandler.sendMessage(msg);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -138,15 +148,15 @@ public class BlueToothConnectThread extends Thread {
 
     public static class BluetoothHandler extends android.os.Handler {
         public final static int SEND_FINISH = 300;
-        private final WeakReference<BlueToothConnectThread> w;
+        private final WeakReference<BlueToothSendFileThread> w;
 
-        public BluetoothHandler(BlueToothConnectThread t) {
+        public BluetoothHandler(BlueToothSendFileThread t) {
             w = new WeakReference<>(t);
         }
 
         @Override
         public void handleMessage(Message msg) {
-            BlueToothConnectThread t = w.get();
+            BlueToothSendFileThread t = w.get();
             if (t == null)
                 return;
             switch (msg.what) {

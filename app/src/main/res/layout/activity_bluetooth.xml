@@ -29,14 +29,6 @@
             android:text="CloseBlueTooth"
             android:textAllCaps="false" />
 
-        <Button
-            android:visibility="gone"
-            android:id="@+id/bluetooth_accept_device_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="onBlueClick"
-            android:text="等待接受连接"
-            android:textAllCaps="false" />
 
     </LinearLayout>
 
@@ -51,7 +43,14 @@
             android:layout_marginStart="8dp"
             android:layout_weight="1"
             android:gravity="center_vertical"
-            android:text="可以附近蓝牙设备检测到此设备" />
+            android:text="开放检测" />
+
+        <TextView
+            android:id="@+id/blue_time_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginStart="8dp"
+            android:gravity="center_vertical" />
 
         <Switch
             android:id="@+id/bluetooth_was_detected_switch"

@@ -6,6 +6,8 @@ import android.content.Context;
 import android.support.v4.app.NotificationCompat;
 import android.util.SparseArray;
 
+import com.test.yysleep.bluttoothtransmission.R;
+
 /**
  * Created by YySleep on 2018/1/17.
  *
@@ -15,6 +17,10 @@ import android.util.SparseArray;
 public class NotificationSys {
 
     public static final int NOTIFICATION_ID = NotificationSys.class.hashCode();
+
+    public static final String TITLE_ACCEPT = "接收数据";
+    public static final String TITLE_SEND = "发送数据";
+    public static final String TITLE_FINISH = "传输结束";
 
     private NotificationSys() {
     }
@@ -83,6 +89,34 @@ public class NotificationSys {
         }
         Notification n = builder.build();
         managerNotify(context, n, id);
+
+        return n;
+    }
+
+    public Notification notifyNotification(Context context, String title, String content) {
+        if (context == null)
+            return null;
+
+        int icon = R.mipmap.ic_launcher;
+
+        if (mArray.get(NotificationSys.NOTIFICATION_ID) == null) {
+            return createNotification(context, NOTIFICATION_ID, CHANNEL_ID_01, title, icon, content);
+        }
+
+        context = context.getApplicationContext();
+
+        NotificationCompat.Builder builder = mArray.get(NOTIFICATION_ID);
+        if (title != null) {
+            builder.setContentTitle(title);
+        }
+        if (icon > 0) {
+            builder.setSmallIcon(icon);
+        }
+        if (content != null) {
+            builder.setContentText(content);
+        }
+        Notification n = builder.build();
+        managerNotify(context, n, NOTIFICATION_ID);
 
         return n;
     }

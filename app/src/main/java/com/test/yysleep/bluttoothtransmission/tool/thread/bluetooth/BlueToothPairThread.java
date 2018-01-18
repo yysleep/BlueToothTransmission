@@ -2,14 +2,10 @@ package com.test.yysleep.bluttoothtransmission.tool.thread.bluetooth;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothServerSocket;
-import android.bluetooth.BluetoothSocket;
 
 
-import com.test.yysleep.bluttoothtransmission.Constant;
 import com.test.yysleep.bluttoothtransmission.util.LogUtil;
 
-import java.io.IOException;
 import java.lang.reflect.Method;
 
 /**

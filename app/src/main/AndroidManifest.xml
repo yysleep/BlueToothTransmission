@@ -39,6 +39,8 @@
             android:name=".ui.bluetooth.BlueToothActivity"
             android:launchMode="singleTask" />
 
+        <service android:name=".service.BluetoothTransportService"/>
+
     </application>
 
 </manifest>

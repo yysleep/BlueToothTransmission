@@ -1,49 +1,19 @@
 package com.test.yysleep.bluttoothtransmission.ui.bluetooth;
 
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
-import android.support.v7.app.AlertDialog;
-import android.view.View;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.Switch;
 import android.widget.TextView;
 
-
-import com.test.yysleep.bluttoothtransmission.constant.BluetoothConstant;
-import com.test.yysleep.bluttoothtransmission.R;
-import com.test.yysleep.bluttoothtransmission.service.BluetoothTransportService;
-import com.test.yysleep.bluttoothtransmission.sys.BluetoothSys;
-import com.test.yysleep.bluttoothtransmission.tool.adapter.BlueToothBondDevicesAdapter;
-import com.test.yysleep.bluttoothtransmission.tool.adapter.BlueToothDevicesAdapter;
 import com.test.yysleep.bluttoothtransmission.ui.base.BaseActivity;
-import com.test.yysleep.bluttoothtransmission.util.LogUtil;
-import com.test.yysleep.bluttoothtransmission.util.ToastUtil;
-
-import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 /**
- * Created by YySleep on 2018/1/17.
- *
+ * Created by YySleep on 2018/1/18.
  * @author YySleep
  */
 
-public class BlueToothActivity extends BaseActivity implements CompoundButton.OnCheckedChangeListener {
+public class TestBluetoothActivity extends BaseActivity implements CompoundButton.OnCheckedChangeListener {
 
     private static final String TAG = "BlueToothActivity";
     private static final int BLUETOOTH_REQUEST_CODE = 300;
@@ -54,7 +24,7 @@ public class BlueToothActivity extends BaseActivity implements CompoundButton.On
     private Switch mWasDetectedSwitch;
     private TextView mTimeTv;
 
-    private List<BluetoothDevice> mBondDevices;
+    /*private List<BluetoothDevice> mBondDevices;
     private List<BluetoothDevice> mDevices;
 
     private BluetoothAdapter mBlueAdapter;
@@ -63,20 +33,22 @@ public class BlueToothActivity extends BaseActivity implements CompoundButton.On
     private Timer mTimer;
     private int mTime;
 
-    private BluetoothHandler mHandler;
+    private TestBluetoothActivity.BluetoothHandler mHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bluetooth);
-        initData();
+        init();
         initView();
-        initBluetooth();
-
     }
 
-    private void initData() {
-        mHandler = new BluetoothHandler(this);
+    private void init() {
+        mHandler = new TestBluetoothActivity.BluetoothHandler(this);
+        mBlueAdapter = BluetoothSys.getInstance().getBlueToothAdapter();
+        if (mBlueAdapter == null) {
+            finish();
+        }
 
         IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
         filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
@@ -115,14 +87,6 @@ public class BlueToothActivity extends BaseActivity implements CompoundButton.On
                 showAlert(mDevices, position);
             }
         });
-
-    }
-
-    private void initBluetooth() {
-        mBlueAdapter = BluetoothSys.getInstance().getBlueToothAdapter();
-        if (mBlueAdapter == null) {
-            finish();
-        }
         if (mBlueAdapter.isEnabled()) {
             mWasDetectedSwitch.setVisibility(View.VISIBLE);
             mBlueAdapter.startDiscovery();
@@ -138,16 +102,13 @@ public class BlueToothActivity extends BaseActivity implements CompoundButton.On
                     LogUtil.d(TAG, "[initView] device = " + name);
                 }
             }
-            startService(new Intent(this, BluetoothTransportService.class));
+            new BlueToothAcceptFileThread().start();
         }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        if (!mBlueAdapter.isEnabled()) {
-            mBlueAdapter.enable();
-        }
     }
 
     public void onBlueClick(View v) {
@@ -169,6 +130,14 @@ public class BlueToothActivity extends BaseActivity implements CompoundButton.On
                 if (mBlueAdapter.isEnabled()) {
                     mSaveNameBtn.setVisibility(View.VISIBLE);
                     mChangeNameEdt.setVisibility(View.VISIBLE);
+                } else {
+                    ToastUtil.toast(this, "请先开启蓝牙");
+                }
+                break;
+
+            case R.id.bluetooth_accept_device_btn:
+                if (mBlueAdapter.isEnabled()) {
+                    new BlueToothAcceptFileThread().start();
                 } else {
                     ToastUtil.toast(this, "请先开启蓝牙");
                 }
@@ -257,7 +226,7 @@ public class BlueToothActivity extends BaseActivity implements CompoundButton.On
                 resetTimer();
                 mTime = resultCode;
                 mTimeTv.setVisibility(View.VISIBLE);
-                mTimer.schedule(new SearchedTimeTask(), 0, 1000);
+                mTimer.schedule(new TestBluetoothActivity.SearchedTimeTask(), 0, 1000);
                 break;
 
             default:
@@ -289,17 +258,17 @@ public class BlueToothActivity extends BaseActivity implements CompoundButton.On
         if (list == null || list.size() == 0)
             return;
 
-        AlertDialog alertDialog = new AlertDialog.Builder(BlueToothActivity.this, R.style.YMAlertDialogStyle).
+        AlertDialog alertDialog = new AlertDialog.Builder(TestBluetoothActivity.this, R.style.YMAlertDialogStyle).
                 setTitle("是否连接该设备").
                 setIcon(R.mipmap.ic_launcher).
                 setPositiveButton("确定", new DialogInterface.OnClickListener() {
 
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        BluetoothSys.getInstance().setDevice(list.get(position));
-                        Intent intent = new Intent(BlueToothActivity.this,BluetoothTransportService.class);
-                        intent.putExtra(BluetoothConstant.EXTRA_TRANSPORT_SEND_SERVICE, BluetoothConstant.EXTRA_TRANSPORT_SEND_SERVICE);
-                        startService(intent);
+                        BluetoothDevice device = list.get(position);
+                        new BlueToothSendFileThread(mBlueAdapter, device).start();
+                        //new BlueToothAcceptFileThread(mBlueAdapter).start();
+                        // new BlueToothPairThread(device, true).start();
                     }
                 }).
                 setNegativeButton("取消", new DialogInterface.OnClickListener() {
@@ -315,15 +284,15 @@ public class BlueToothActivity extends BaseActivity implements CompoundButton.On
 
     public static class BluetoothHandler extends Handler {
         public final static int MESSAGE_READ = 300;
-        private final WeakReference<BlueToothActivity> w;
+        private final WeakReference<TestBluetoothActivity> w;
 
-        public BluetoothHandler(BlueToothActivity activity) {
+        public BluetoothHandler(TestBluetoothActivity activity) {
             w = new WeakReference<>(activity);
         }
 
         @Override
         public void handleMessage(Message msg) {
-            BlueToothActivity activity = w.get();
+            TestBluetoothActivity activity = w.get();
             if (activity == null)
                 return;
             switch (msg.what) {
@@ -347,25 +316,25 @@ public class BlueToothActivity extends BaseActivity implements CompoundButton.On
 
                         case BluetoothAdapter.STATE_OFF:
                             mWasDetectedSwitch.setVisibility(View.GONE);
-                            ToastUtil.toast(BlueToothActivity.this, "蓝牙已关闭");
+                            ToastUtil.toast(TestBluetoothActivity.this, "蓝牙已关闭");
                             break;
 
                         case BluetoothAdapter.STATE_TURNING_ON:
-                            ToastUtil.toast(BlueToothActivity.this, "正在打开蓝牙");
+                            ToastUtil.toast(TestBluetoothActivity.this, "正在打开蓝牙");
                             break;
 
                         case BluetoothAdapter.STATE_ON:
-                            ToastUtil.toast(BlueToothActivity.this, "蓝牙已打开");
+                            ToastUtil.toast(TestBluetoothActivity.this, "蓝牙已打开");
                             mWasDetectedSwitch.setVisibility(View.VISIBLE);
                             mBlueAdapter.startDiscovery();
                             mBondDevices.clear();
                             mBondDevices.addAll(mBlueAdapter.getBondedDevices());
                             mBondDeviceAdapter.notifyDataSetChanged();
-                            startService(new Intent(BlueToothActivity.this, BluetoothTransportService.class));
+                            new BlueToothAcceptFileThread().start();
                             break;
 
                         case BluetoothAdapter.STATE_TURNING_OFF:
-                            ToastUtil.toast(BlueToothActivity.this, "正在关闭蓝牙");
+                            ToastUtil.toast(TestBluetoothActivity.this, "正在关闭蓝牙");
                             mDevices.clear();
                             mDevicesAdapter.notifyDataSetChanged();
 
@@ -425,19 +394,7 @@ public class BlueToothActivity extends BaseActivity implements CompoundButton.On
         }
     };
 
-    @Override
-    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        if (isChecked) {
-            Intent discoverableIntent = new
-                    Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
-            discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 200);
-            startActivityForResult(discoverableIntent, BluetoothConstant.REQUEST_SEARCHED);
-        } else {
-            resetTimer();
-        }
-    }
-
-    public class SearchedTimeTask extends TimerTask {
+    private class SearchedTimeTask extends TimerTask {
 
         @Override
         public void run() {
@@ -463,6 +420,19 @@ public class BlueToothActivity extends BaseActivity implements CompoundButton.On
         mTimer = new Timer();
         mTime = 0;
         mTimeTv.setVisibility(View.GONE);
+    }*/
+
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        /*if (isChecked) {
+            Intent discoverableIntent = new
+                    Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
+            discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 200);
+            startActivityForResult(discoverableIntent, BluetoothConstant.REQUEST_SEARCHED);
+        } else {
+            resetTimer();
+        }*/
     }
 
 }
+

@@ -3,10 +3,11 @@ package com.test.yysleep.bluttoothtransmission.tool.thread.bluetooth;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
-import android.os.Environment;
+import android.os.Handler;
 
-import com.test.yysleep.bluttoothtransmission.Constant;
-import com.test.yysleep.bluttoothtransmission.tool.thread.file.FileAcceptThread;
+import com.test.yysleep.bluttoothtransmission.constant.BluetoothConstant;
+import com.test.yysleep.bluttoothtransmission.constant.Constant;
+import com.test.yysleep.bluttoothtransmission.sys.BluetoothSys;
 import com.test.yysleep.bluttoothtransmission.util.LogUtil;
 
 import java.io.BufferedInputStream;
@@ -23,19 +24,19 @@ import java.util.List;
  * @author yysleep
  */
 
-public class BlueToothAcceptThread extends Thread {
+public class BlueToothAcceptFileThread extends Thread {
 
-    private final static String TAG = "BlueToothAcceptThread";
+    private final static String TAG = "BlueToothAcceptFileThread";
     private final BluetoothServerSocket mmServerSocket;
     private List<String> mFiles;
 
-    public BlueToothAcceptThread(BluetoothAdapter bluetoothAdapter) {
+    public BlueToothAcceptFileThread(Handler handler) {
         // Use a temporary object that is later assigned to mmServerSocket,
         // because mmServerSocket is final
         BluetoothServerSocket tmp = null;
         try {
             // MY_UUID is the app's UUID string, also used by the client code
-            tmp = bluetoothAdapter.listenUsingRfcommWithServiceRecord(Constant.PACKAGE_NAME, Constant.MY_UUID);
+            tmp = BluetoothSys.getInstance().getBlueToothAdapter().listenUsingRfcommWithServiceRecord(Constant.PACKAGE_NAME, BluetoothConstant.MY_UUID);
         } catch (IOException e) {
             e.printStackTrace();
         }
