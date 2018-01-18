@@ -19,8 +19,9 @@ public class NotificationSys {
     public static final int NOTIFICATION_ID = NotificationSys.class.hashCode();
 
     public static final String TITLE_ACCEPT = "接收数据";
+    public static final String TITLE_ACCEPT_FINISH = "接受结束";
     public static final String TITLE_SEND = "发送数据";
-    public static final String TITLE_FINISH = "传输结束";
+    public static final String TITLE_SEND_FINISH = "发送结束";
 
     private NotificationSys() {
     }

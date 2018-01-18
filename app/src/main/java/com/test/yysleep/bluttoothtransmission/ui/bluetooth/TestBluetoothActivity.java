@@ -266,7 +266,7 @@ public class TestBluetoothActivity extends BaseActivity implements CompoundButto
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         BluetoothDevice device = list.get(position);
-                        new BlueToothSendFileThread(mBlueAdapter, device).start();
+                        new BlueToothConnectManager(mBlueAdapter, device).start();
                         //new BlueToothAcceptFileThread(mBlueAdapter).start();
                         // new BlueToothPairThread(device, true).start();
                     }
