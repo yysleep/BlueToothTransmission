@@ -1,6 +1,21 @@
 apply plugin: 'com.android.application'
 
 android {
+    signingConfigs {
+        debug {
+            keyAlias 'yysleep'
+            keyPassword 'yangzheng1'
+            storeFile file('yysleep.jks')
+            storePassword 'yangzheng1'
+        }
+        release {
+            keyAlias 'yysleep'
+            keyPassword 'yangzheng1'
+            storeFile file('yysleep.jks')
+            storePassword 'yangzheng1'
+        }
+    }
+
     compileSdkVersion 26
     defaultConfig {
         applicationId "com.test.yysleep.bluttoothtransmission"
@@ -11,9 +26,22 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
-        release {
+        debug {
+            signingConfig signingConfigs.debug
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            versionNameSuffix defaultConfig.versionName
+        }
+        release {
+            signingConfig signingConfigs.release
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    android.applicationVariants.all { variant ->
+        variant.outputs.all {
+            outputFileName = "Bluetooth-${variant.name}-${defaultConfig.versionName}.apk"
         }
     }
 }
