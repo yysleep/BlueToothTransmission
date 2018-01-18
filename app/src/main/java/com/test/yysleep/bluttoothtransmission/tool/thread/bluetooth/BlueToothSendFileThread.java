@@ -29,11 +29,13 @@ import java.util.List;
 public class BlueToothSendFileThread extends Thread {
 
     private final static String TAG = "BlueToothSendFileThread";
+    private final static long FINISH = 1;
     private final BluetoothSocket mSocket;
     private final BluetoothDevice mDevice;
     private BluetoothAdapter mBluetoothAdapter;
     private Handler mHandler;
     private List<String> mFiles;
+
 
     public BlueToothSendFileThread(Handler handler) {
         // Use a temporary object that is later assigned to mSocket,
@@ -107,6 +109,7 @@ public class BlueToothSendFileThread extends Thread {
                 continue;
             }
             long fileSize = file.length();
+            LogUtil.d(TAG, "[sendFile] file.length" + file.length() + " --- " + fileSize);
             long sendSize = 0;
             try {
                 byte[] bytes = new byte[1024];
@@ -115,14 +118,15 @@ public class BlueToothSendFileThread extends Thread {
                 buffOut = new BufferedOutputStream(mSocket.getOutputStream());
                 while ((len = buffIn.read(bytes)) != -1) {
                     buffOut.write(bytes, 0, len);
+                    if (fileSize > 0) {
+                        sendSize = len + sendSize;
+                        sendMessage(BluetoothConstant.MESSAGE_UPDATE_SEND_NOTIFICATION, sendSize, fileSize);
+                    }
                     buffOut.flush();
-                    sendSize = len + sendSize;
-                    Message msg = Message.obtain();
-                    msg.what = BluetoothConstant.MESSAGE_UPDATE_SEND_NOTIFICATION;
-                    msg.obj = (float) (sendSize / fileSize);
-                    mHandler.sendMessage(msg);
                 }
-            } catch (IOException e) {
+                Thread.sleep(500);
+                sendMessage(BluetoothConstant.MESSAGE_FINISH_SEND_NOTIFICATION, FINISH, FINISH);
+            } catch (IOException | InterruptedException e) {
                 e.printStackTrace();
             } finally {
                 if (buffIn != null) {
@@ -146,7 +150,25 @@ public class BlueToothSendFileThread extends Thread {
         LogUtil.d(TAG, "[sendFile] 发送文件结束");
     }
 
-    public static class BluetoothHandler extends android.os.Handler {
+    private void sendMessage(int what, long sendSize, long fileSize) {
+        Message msg = Message.obtain();
+        msg.what = what;
+        switch (what) {
+            case BluetoothConstant.MESSAGE_UPDATE_SEND_NOTIFICATION:
+                msg.obj = (int) ((float) 100 * sendSize / fileSize);
+                break;
+
+            case BluetoothConstant.MESSAGE_FINISH_SEND_NOTIFICATION:
+                msg.obj = 100;
+
+            default:
+                msg.obj = 100;
+                break;
+        }
+        mHandler.sendMessage(msg);
+    }
+
+    public static class BluetoothHandler extends Handler {
         public final static int SEND_FINISH = 300;
         private final WeakReference<BlueToothSendFileThread> w;
 

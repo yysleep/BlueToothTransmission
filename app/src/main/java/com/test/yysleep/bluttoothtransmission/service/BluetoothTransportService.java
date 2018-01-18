@@ -13,6 +13,7 @@ import com.test.yysleep.bluttoothtransmission.constant.BluetoothConstant;
 import com.test.yysleep.bluttoothtransmission.sys.NotificationSys;
 import com.test.yysleep.bluttoothtransmission.tool.thread.bluetooth.BlueToothAcceptFileThread;
 import com.test.yysleep.bluttoothtransmission.tool.thread.bluetooth.BlueToothSendFileThread;
+import com.test.yysleep.bluttoothtransmission.util.ToastUtil;
 
 import java.lang.ref.WeakReference;
 
@@ -74,15 +75,18 @@ public class BluetoothTransportService extends Service {
             if (service == null)
                 return;
             String title = null;
-            String content = (String) msg.obj;
+            String content = null;
             switch (msg.what) {
 
                 case BluetoothConstant.MESSAGE_UPDATE_SEND_NOTIFICATION:
+                    content = (int) msg.obj + "%";
                     title = NotificationSys.TITLE_SEND;
                     break;
 
                 case BluetoothConstant.MESSAGE_FINISH_SEND_NOTIFICATION:
                     title = NotificationSys.TITLE_FINISH;
+                    content = "发送完毕";
+                    ToastUtil.toast(service, content);
                     break;
 
                 case BluetoothConstant.MESSAGE_UPDATE_ACCEPT_NOTIFICATION:
@@ -99,6 +103,7 @@ public class BluetoothTransportService extends Service {
             if (title != null) {
                 service.mNtfSys.notifyNotification(service, title, content);
             }
+
         }
     }
 }

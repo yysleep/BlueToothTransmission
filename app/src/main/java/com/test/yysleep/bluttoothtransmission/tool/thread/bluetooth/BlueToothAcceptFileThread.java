@@ -105,7 +105,8 @@ public class BlueToothAcceptFileThread extends Thread {
                     buffOut.write(bytes, 0, len);
                     buffOut.flush();
                 }
-            } catch (IOException e) {
+                Thread.sleep(500);
+            } catch (IOException | InterruptedException e) {
                 e.printStackTrace();
             } finally {
 
