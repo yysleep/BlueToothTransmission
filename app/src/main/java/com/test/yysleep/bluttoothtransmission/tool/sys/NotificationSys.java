@@ -16,7 +16,7 @@ import com.test.yysleep.bluttoothtransmission.R;
 
 public class NotificationSys {
 
-    public static final int NOTIFICATION_ID = NotificationSys.class.hashCode();
+    public static final int NOTIFICATION_ID = 1008;
 
     public static final String TITLE_ACCEPT = "接收数据";
     public static final String TITLE_ACCEPT_FINISH = "接受结束";

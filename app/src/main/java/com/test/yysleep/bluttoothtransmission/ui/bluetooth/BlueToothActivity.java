@@ -125,6 +125,7 @@ public class BlueToothActivity extends BaseActivity implements CompoundButton.On
         }
         if (mBlueAdapter.isEnabled()) {
             mWasDetectedSwitch.setVisibility(View.VISIBLE);
+            mWasDetectedSwitch.setChecked(true);
             mBlueAdapter.startDiscovery();
             mBondDevices.addAll(mBlueAdapter.getBondedDevices());
             mBondDeviceAdapter.notifyDataSetChanged();
@@ -357,6 +358,7 @@ public class BlueToothActivity extends BaseActivity implements CompoundButton.On
                         case BluetoothAdapter.STATE_ON:
                             ToastUtil.toast(BlueToothActivity.this, "蓝牙已打开");
                             mWasDetectedSwitch.setVisibility(View.VISIBLE);
+                            mWasDetectedSwitch.setChecked(true);
                             mBlueAdapter.startDiscovery();
                             mBondDevices.clear();
                             mBondDevices.addAll(mBlueAdapter.getBondedDevices());

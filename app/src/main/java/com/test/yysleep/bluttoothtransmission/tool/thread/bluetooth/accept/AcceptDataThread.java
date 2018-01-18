@@ -177,7 +177,7 @@ public class AcceptDataThread extends Thread {
                 buffOut.flush();
                 buffOut = new BufferedOutputStream(socket.getOutputStream());
                 replyState(buffOut);
-
+                mHandler.sendEmptyMessageDelayed(BluetoothConstant.MESSAGE_FINISH_ACCEPT_NOTIFICATION, 1000);
             } catch (IOException e) {
                 e.printStackTrace();
 
@@ -208,9 +208,6 @@ public class AcceptDataThread extends Thread {
         File file = new File(list.get(0).getPath());
         boolean fileExists = file.exists();
         LogUtil.d(TAG, "[acceptFile] file.exists : " + fileExists + " --- " + file.length());
-        if(fileExists){
-            sendMessage(BluetoothConstant.MESSAGE_FINISH_ACCEPT_NOTIFICATION, FINISH, FINISH);
-        }
         BluetoothSys.getInstance().clearTransportFiles();
     }
 
@@ -224,19 +221,8 @@ public class AcceptDataThread extends Thread {
     private void sendMessage(int what, long acceptSize, long fileSize) {
         Message msg = Message.obtain();
         msg.what = what;
-        switch (what) {
-            case BluetoothConstant.MESSAGE_UPDATE_ACCEPT_NOTIFICATION:
-                msg.obj = (int) ((float) 100 * acceptSize / fileSize);
-                LogUtil.d(TAG, "[sendMessage] progress = " + msg.obj);
-                break;
-
-            case BluetoothConstant.MESSAGE_FINISH_ACCEPT_NOTIFICATION:
-                msg.obj = 100;
-
-            default:
-                msg.obj = 100;
-                break;
-        }
+        msg.obj = (int) ((float) 100 * acceptSize / fileSize);
+        LogUtil.d(TAG, "[sendMessage] progress = " + msg.obj);
         mHandler.sendMessage(msg);
     }
 

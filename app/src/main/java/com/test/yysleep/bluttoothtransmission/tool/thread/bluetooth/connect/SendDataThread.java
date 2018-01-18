@@ -46,7 +46,7 @@ public class SendDataThread extends Thread {
             mSocket.connect();
             sendFileInfo();
             transportFile();
-            sendMessage(BluetoothConstant.MESSAGE_FINISH_SEND_NOTIFICATION, FINISH, FINISH);
+            mHandler.sendEmptyMessageDelayed(BluetoothConstant.MESSAGE_FINISH_SEND_NOTIFICATION, 1000);
         } catch (IOException connectException) {
             try {
                 mSocket.close();
@@ -175,19 +175,7 @@ public class SendDataThread extends Thread {
     private void sendMessage(int what, long sendSize, long fileSize) {
         Message msg = Message.obtain();
         msg.what = what;
-        LogUtil.d(TAG, "[sendMessage] sendSize = " + sendSize);
-        switch (what) {
-            case BluetoothConstant.MESSAGE_UPDATE_SEND_NOTIFICATION:
-                msg.obj = (int) ((float) 100 * sendSize / fileSize);
-                break;
-
-            case BluetoothConstant.MESSAGE_FINISH_SEND_NOTIFICATION:
-                msg.obj = 100;
-
-            default:
-                msg.obj = 100;
-                break;
-        }
+        msg.obj = (int) ((float) 100 * sendSize / fileSize);
         mHandler.sendMessage(msg);
     }
 }

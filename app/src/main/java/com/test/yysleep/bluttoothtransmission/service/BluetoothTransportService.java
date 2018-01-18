@@ -78,33 +78,28 @@ public class BluetoothTransportService extends Service {
             BluetoothTransportService service = w.get();
             if (service == null)
                 return;
-            String title = null;
-            String content = null;
             switch (msg.what) {
+                case BluetoothConstant.MESSAGE_FINISH_SEND_NOTIFICATION:
+                    ToastUtil.toast(service, "发送完毕");
+                    service.mNtfSys.notifyNotification(service, "发送完毕", "发送完毕");
+                    break;
+
+                case BluetoothConstant.MESSAGE_FINISH_ACCEPT_NOTIFICATION:
+                    ToastUtil.toast(service, "接收完毕");
+                    service.mNtfSys.notifyNotification(service, "接收完毕", "接收完毕");
+                    break;
 
                 case BluetoothConstant.MESSAGE_UPDATE_SEND_NOTIFICATION:
                     service.mNtfSys.notifyNotification(service, NotificationSys.TITLE_SEND, (int) msg.obj + "%");
                     break;
 
-                case BluetoothConstant.MESSAGE_FINISH_SEND_NOTIFICATION:
-                    ToastUtil.toast(service, "发送完毕");
-                    service.mNtfSys.notifyNotification(service, NotificationSys.TITLE_SEND_FINISH, "发送完毕");
-                    break;
-
                 case BluetoothConstant.MESSAGE_UPDATE_ACCEPT_NOTIFICATION:
                     service.mNtfSys.notifyNotification(service, NotificationSys.TITLE_ACCEPT, (int) msg.obj + "%");
-
-                    break;
-
-                case BluetoothConstant.MESSAGE_FINISH_ACCEPT_NOTIFICATION:
-                    ToastUtil.toast(service, "接收完毕");
-                    service.mNtfSys.notifyNotification(service, NotificationSys.TITLE_ACCEPT_FINISH, "接收完毕");
                     break;
 
                 default:
                     break;
             }
-
         }
     }
 }
