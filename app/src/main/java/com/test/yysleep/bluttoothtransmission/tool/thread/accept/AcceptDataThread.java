@@ -1,4 +1,4 @@
-package com.test.yysleep.bluttoothtransmission.tool.thread.bluetooth.accept;
+package com.test.yysleep.bluttoothtransmission.tool.thread.accept;
 
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;

@@ -1,10 +1,9 @@
-package com.test.yysleep.bluttoothtransmission.tool.thread.bluetooth.connect;
+package com.test.yysleep.bluttoothtransmission.tool.thread.connect;
 
 import android.bluetooth.BluetoothSocket;
 import android.os.Handler;
 import android.os.Message;
 
-import com.google.gson.Gson;
 import com.test.yysleep.bluttoothtransmission.constant.BluetoothConstant;
 import com.test.yysleep.bluttoothtransmission.constant.Constant;
 import com.test.yysleep.bluttoothtransmission.model.FileInfo;
@@ -16,7 +15,6 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -65,7 +63,7 @@ public class SendDataThread extends Thread {
         BufferedOutputStream buffOut = null;
         // Todo
         List<String> mCheckedFilePaths = new ArrayList<>();
-        mCheckedFilePaths.add(Constant.PATH);
+        mCheckedFilePaths.add(Constant.PATH_01);
 
         BluetoothSys.getInstance().clearTransportFiles();
         List<FileInfo> mFileList = BluetoothSys.getInstance().getTransportFiles();
