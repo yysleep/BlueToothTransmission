@@ -10,7 +10,7 @@ import android.support.annotation.Nullable;
 import com.test.yysleep.bluttoothtransmission.constant.BluetoothConstant;
 import com.test.yysleep.bluttoothtransmission.tool.sys.NotificationSys;
 import com.test.yysleep.bluttoothtransmission.manager.BlueToothConnectManager;
-import com.test.yysleep.bluttoothtransmission.tool.thread.bluetooth.accept.AcceptDataThread;
+import com.test.yysleep.bluttoothtransmission.tool.thread.accept.AcceptDataThread;
 import com.test.yysleep.bluttoothtransmission.util.ToastUtil;
 
 import java.lang.ref.WeakReference;

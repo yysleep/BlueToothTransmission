@@ -1,4 +1,4 @@
-package com.test.yysleep.bluttoothtransmission.tool.thread.bluetooth;
+package com.test.yysleep.bluttoothtransmission.tool.thread;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;

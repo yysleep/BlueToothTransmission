@@ -2,23 +2,13 @@ package com.test.yysleep.bluttoothtransmission.manager;
 
 import android.bluetooth.BluetoothSocket;
 import android.os.Handler;
-import android.os.Message;
 
-import com.google.gson.Gson;
 import com.test.yysleep.bluttoothtransmission.constant.BluetoothConstant;
-import com.test.yysleep.bluttoothtransmission.constant.Constant;
-import com.test.yysleep.bluttoothtransmission.model.FileInfo;
 import com.test.yysleep.bluttoothtransmission.tool.sys.BluetoothSys;
-import com.test.yysleep.bluttoothtransmission.tool.thread.bluetooth.connect.SendDataThread;
+import com.test.yysleep.bluttoothtransmission.tool.thread.connect.SendDataThread;
 import com.test.yysleep.bluttoothtransmission.util.LogUtil;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by Administrator on 2018/1/17.
