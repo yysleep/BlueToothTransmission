@@ -153,7 +153,7 @@ public class BlueToothActivity extends BaseActivity implements CompoundButton.On
 
     public void onBlueClick(View v) {
         if (mBlueAdapter == null) {
-            ToastUtil.toast(this, "该设备不支持蓝牙设备");
+            ToastUtil.toast("该设备不支持蓝牙设备");
         }
         switch (v.getId()) {
             case R.id.bluetooth_open_bluetooth_btn:
@@ -162,7 +162,7 @@ public class BlueToothActivity extends BaseActivity implements CompoundButton.On
                     // mBlueAdapter.enable();
                     startActivityForResult(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE), BLUETOOTH_REQUEST_CODE);
                 } else {
-                    ToastUtil.toast(this, "蓝牙处于开启状态");
+                    ToastUtil.toast("蓝牙处于开启状态");
                 }
                 break;
 
@@ -171,23 +171,23 @@ public class BlueToothActivity extends BaseActivity implements CompoundButton.On
                     mSaveNameBtn.setVisibility(View.VISIBLE);
                     mChangeNameEdt.setVisibility(View.VISIBLE);
                 } else {
-                    ToastUtil.toast(this, "请先开启蓝牙");
+                    ToastUtil.toast("请先开启蓝牙");
                 }
                 break;
 
             case R.id.bluetooth_change_bluetooth_name_save_btn:
                 String newName = mChangeNameEdt.getText().toString().trim();
                 if ("".equals(newName)) {
-                    ToastUtil.toast(this, "名字不可以为空");
+                    ToastUtil.toast("名字不可以为空");
                     return;
                 }
                 LogUtil.d(TAG, "[onMainClick] the new name = " + newName);
                 if (mBlueAdapter.isEnabled()) {
                     mBlueAdapter.setName(newName);
-                    ToastUtil.toast(this, "修改成功 --- " + newName);
+                    ToastUtil.toast("修改成功 --- " + newName);
                     mChangeNameEdt.setText("");
                 } else {
-                    ToastUtil.toast(this, "请先开启蓝牙");
+                    ToastUtil.toast("请先开启蓝牙");
                 }
                 mSaveNameBtn.setVisibility(View.GONE);
                 mChangeNameEdt.setVisibility(View.GONE);
@@ -198,7 +198,7 @@ public class BlueToothActivity extends BaseActivity implements CompoundButton.On
                     mBlueAdapter.disable();
                     mWasDetectedSwitch.setChecked(false);
                 } else {
-                    ToastUtil.toast(this, "蓝牙处于关闭状态");
+                    ToastUtil.toast("蓝牙处于关闭状态");
                 }
                 break;
 
@@ -208,7 +208,7 @@ public class BlueToothActivity extends BaseActivity implements CompoundButton.On
                     mBondDevices.addAll(mBlueAdapter.getBondedDevices());
                     mBondDeviceAdapter.notifyDataSetChanged();
                 } else {
-                    ToastUtil.toast(this, "请先开启蓝牙");
+                    ToastUtil.toast("请先开启蓝牙");
                 }
                 break;
 
@@ -219,7 +219,7 @@ public class BlueToothActivity extends BaseActivity implements CompoundButton.On
                     }
                     mBlueAdapter.startDiscovery();
                 } else {
-                    ToastUtil.toast(this, "请先开启蓝牙");
+                    ToastUtil.toast("请先开启蓝牙");
                 }
                 break;
 
@@ -298,7 +298,7 @@ public class BlueToothActivity extends BaseActivity implements CompoundButton.On
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         BluetoothSys.getInstance().setDevice(list.get(position));
-                        Intent intent = new Intent(BlueToothActivity.this,BluetoothTransportService.class);
+                        Intent intent = new Intent(BlueToothActivity.this, BluetoothTransportService.class);
                         intent.putExtra(BluetoothConstant.EXTRA_TRANSPORT_SEND_SERVICE, BluetoothConstant.EXTRA_TRANSPORT_SEND_SERVICE);
                         startService(intent);
                     }
@@ -348,18 +348,20 @@ public class BlueToothActivity extends BaseActivity implements CompoundButton.On
 
                         case BluetoothAdapter.STATE_OFF:
                             mWasDetectedSwitch.setVisibility(View.GONE);
-                            ToastUtil.toast(BlueToothActivity.this, "蓝牙已关闭");
+                            ToastUtil.toast("蓝牙已关闭");
                             break;
 
                         case BluetoothAdapter.STATE_TURNING_ON:
-                            ToastUtil.toast(BlueToothActivity.this, "正在打开蓝牙");
+                            ToastUtil.toast("正在打开蓝牙");
                             break;
 
                         case BluetoothAdapter.STATE_ON:
-                            ToastUtil.toast(BlueToothActivity.this, "蓝牙已打开");
+                            ToastUtil.toast("蓝牙已打开");
                             mWasDetectedSwitch.setVisibility(View.VISIBLE);
                             mWasDetectedSwitch.setChecked(true);
+
                             mBlueAdapter.startDiscovery();
+
                             mBondDevices.clear();
                             mBondDevices.addAll(mBlueAdapter.getBondedDevices());
                             mBondDeviceAdapter.notifyDataSetChanged();
@@ -367,12 +369,17 @@ public class BlueToothActivity extends BaseActivity implements CompoundButton.On
                             break;
 
                         case BluetoothAdapter.STATE_TURNING_OFF:
-                            ToastUtil.toast(BlueToothActivity.this, "正在关闭蓝牙");
+                            ToastUtil.toast("正在关闭蓝牙");
+                            mWasDetectedSwitch.setChecked(false);
+                            mWasDetectedSwitch.setVisibility(View.GONE);
+
+                            mBlueAdapter.cancelDiscovery();
+
                             mDevices.clear();
                             mDevicesAdapter.notifyDataSetChanged();
-
-                            if (mBlueAdapter.isDiscovering())
-                                mBlueAdapter.cancelDiscovery();
+                            mBondDevices.clear();
+                            mBondDeviceAdapter.notifyDataSetChanged();
+                            stopService(new Intent(BlueToothActivity.this, BluetoothTransportService.class));
                             break;
 
                         default:

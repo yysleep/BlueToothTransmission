@@ -1,4 +1,4 @@
-package com.test.yysleep.bluttoothtransmission.tool.thread.connect;
+package com.test.yysleep.bluttoothtransmission.tool.thread.send;
 
 import android.bluetooth.BluetoothSocket;
 import android.os.Handler;
@@ -9,6 +9,7 @@ import com.test.yysleep.bluttoothtransmission.constant.Constant;
 import com.test.yysleep.bluttoothtransmission.model.FileInfo;
 import com.test.yysleep.bluttoothtransmission.tool.sys.BluetoothSys;
 import com.test.yysleep.bluttoothtransmission.util.LogUtil;
+import com.test.yysleep.bluttoothtransmission.util.ToastUtil;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -16,8 +17,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -43,12 +44,19 @@ public class SendDataThread extends Thread {
         BluetoothSys.getInstance().getBlueToothAdapter().cancelDiscovery();
         LogUtil.d(TAG, "[run] mSocket = " + mSocket);
         try {
+            if (interrupted()) {
+                throw new InterruptedException();
+            }
             mSocket.connect();
+            BluetoothSys.getInstance().clearSendFilePaths();
             sendFileInfo();
             transportFile();
-        } catch (IOException connectException) {
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        } finally {
             try {
-                mSocket.close();
+                if (mSocket != null)
+                    mSocket.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -63,29 +71,32 @@ public class SendDataThread extends Thread {
         LogUtil.d(TAG, "[sendFileInfo] 开始发送文件信息");
         BufferedOutputStream out = null;
         BufferedInputStream in = null;
-        // Todo
-        List<String> mCheckedFilePaths = new ArrayList<>();
-        mCheckedFilePaths.add(Constant.PATH_01);
-        mCheckedFilePaths.add(Constant.PATH_02);
-        mCheckedFilePaths.add(Constant.PATH_03);
-        mCheckedFilePaths.add(Constant.PATH_04);
-        mCheckedFilePaths.add(Constant.PATH_05);
 
-        BluetoothSys.getInstance().clearTransportFiles();
-        List<FileInfo> mFileList = BluetoothSys.getInstance().getTransportFiles();
+        // todo
+        List<String> filePaths = BluetoothSys.getInstance().getSendFilePaths();
+        filePaths.add(Constant.PATH_01);
+        filePaths.add(Constant.PATH_02);
+        filePaths.add(Constant.PATH_03);
+        filePaths.add(Constant.PATH_04);
+        filePaths.add(Constant.PATH_05);
 
         StringBuilder builder = new StringBuilder();
-        for (String path : mCheckedFilePaths) {
+        ToastUtil.toast("开始传输文件信息");
+        Iterator<String> itr = filePaths.iterator();
+        String path = null;
+        while (itr.hasNext()) {
+            path = itr.next();
             File file = new File(path);
             if (file.exists()) {
                 long length = file.length();
-                builder.append(path).append(" ").append(length).append(" ");
-                FileInfo info = new FileInfo();
-                info.setLength(length);
-                info.setPath(path);
-                mFileList.add(info);
+                if (length == 0) {
+                    filePaths.remove(path);
+                } else {
+                    builder.append(path).append(" ").append(length).append(" ");
+                }
             }
         }
+        
         String s = builder.toString();
         byte[] bytes = s.getBytes();
         if (bytes.length == 0) {
@@ -128,14 +139,14 @@ public class SendDataThread extends Thread {
             return;
         }
 
-        List<FileInfo> mFileList = BluetoothSys.getInstance().getTransportFiles();
+        List<String> mFileList = BluetoothSys.getInstance().getSendFilePaths();
 
         LogUtil.d(TAG, "[transportFile] 开始发送文件");
         BufferedInputStream in = null;
         BufferedOutputStream out = null;
         int fileNum = 1;
-        for (FileInfo info : mFileList) {
-            File file = new File(info.getPath());
+        for (String path : mFileList) {
+            File file = new File(path);
             if (!file.exists()) {
                 continue;
             }
@@ -147,6 +158,7 @@ public class SendDataThread extends Thread {
                 int len = 0;
                 in = new BufferedInputStream(new FileInputStream(file));
                 out = new BufferedOutputStream(mSocket.getOutputStream());
+                ToastUtil.toast("正在发送第 " + fileNum + " 个文件");
                 while ((len = in.read(bytes)) != -1) {
                     out.write(bytes, 0, len);
                     out.flush();
@@ -191,5 +203,18 @@ public class SendDataThread extends Thread {
         byte[] b = new byte[flag.getBytes().length];
         int len = in.read(b);
         return flag.equals(new String(b));
+    }
+
+    public void cancel() {
+        try {
+            if (mSocket != null) {
+                mSocket.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        interrupt();
+
+        LogUtil.d(TAG, "[cancel] close Socket");
     }
 }

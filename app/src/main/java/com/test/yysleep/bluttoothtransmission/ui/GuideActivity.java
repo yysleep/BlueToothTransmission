@@ -58,7 +58,7 @@ public class GuideActivity extends AppCompatActivity {
         switch (requestCode) {
             case PERMISSION_REQUEST_CODE:
                 if (grantResults.length == 0 || permissions.length == 0) {
-                    ToastUtil.toast(this, "权限被拒，请去设置权限");
+                    ToastUtil.toast("权限被拒，请去设置权限");
                     break;
                 }
                 for (int i = 0; i < permissions.length; i++) {

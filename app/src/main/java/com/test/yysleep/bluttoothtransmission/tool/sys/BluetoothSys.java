@@ -20,12 +20,13 @@ public class BluetoothSys {
     private static volatile BluetoothSys instance;
     private BluetoothAdapter mBlueAdapter;
     private BluetoothDevice mDevice;
-    private List<FileInfo> mTransportFiles;
-    private List<String> mCheckedFilePaths;
+    private List<FileInfo> mAcceptFiles;
+    private List<String> mSendFilePaths;
 
     private BluetoothSys() {
         mBlueAdapter = BluetoothAdapter.getDefaultAdapter();
-        mTransportFiles = new ArrayList<>();
+        mAcceptFiles = new ArrayList<>();
+        mSendFilePaths = new ArrayList<>();
     }
 
     public static BluetoothSys getInstance() {
@@ -55,21 +56,21 @@ public class BluetoothSys {
         this.mDevice = device;
     }
 
-    public List<FileInfo> getTransportFiles() {
-        return mTransportFiles;
+    public List<FileInfo> getAcceptFiles() {
+        return mAcceptFiles;
     }
 
-    public void clearTransportFiles() {
-        if (mTransportFiles != null)
-            mTransportFiles.clear();
+    public void clearAcceptFiles() {
+        if (mAcceptFiles != null)
+            mAcceptFiles.clear();
     }
 
-    public List<String> getCheckedFilePaths() {
-        return mCheckedFilePaths;
+    public List<String> getSendFilePaths() {
+        return mSendFilePaths;
     }
 
-    public void clearCheckedFilePaths() {
-        if (mTransportFiles != null)
-            mTransportFiles.clear();
+    public void clearSendFilePaths() {
+        if (mSendFilePaths != null)
+            mSendFilePaths.clear();
     }
 }

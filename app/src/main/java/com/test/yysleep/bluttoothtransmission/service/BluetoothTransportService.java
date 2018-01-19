@@ -10,7 +10,6 @@ import android.support.annotation.Nullable;
 import com.test.yysleep.bluttoothtransmission.constant.BluetoothConstant;
 import com.test.yysleep.bluttoothtransmission.tool.sys.NotificationSys;
 import com.test.yysleep.bluttoothtransmission.manager.BlueToothConnectManager;
-import com.test.yysleep.bluttoothtransmission.tool.thread.accept.AcceptDataThread;
 import com.test.yysleep.bluttoothtransmission.util.ToastUtil;
 
 import java.lang.ref.WeakReference;
@@ -38,8 +37,10 @@ public class BluetoothTransportService extends Service {
     public void onCreate() {
         super.onCreate();
         mHandler = new TransportHandler(this);
-        new AcceptDataThread(mHandler).start();
         mNtfSys = NotificationSys.getInstance();
+
+        mManager = new BlueToothConnectManager(mHandler);
+        mManager.executeAccept();
     }
 
     @Override
@@ -55,15 +56,19 @@ public class BluetoothTransportService extends Service {
 
         switch (extra) {
             case BluetoothConstant.EXTRA_TRANSPORT_SEND_SERVICE:
-                if (mManager != null) {
-                    mManager.cancel();
-                    mManager = null;
-                }
-                mManager = new BlueToothConnectManager(mHandler);
-                mManager.execute();
+                mManager.executeConnect();
                 break;
         }
         return START_STICKY;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (mManager != null) {
+            mManager.cancelAccept();
+            mManager.cancelSend();
+        }
     }
 
     private static class TransportHandler extends Handler {
@@ -80,17 +85,18 @@ public class BluetoothTransportService extends Service {
                 return;
             switch (msg.what) {
                 case BluetoothConstant.MESSAGE_FINISH_SEND_NOTIFICATION:
-                    ToastUtil.toast(service, "发送完毕");
+                    ToastUtil.toast("发送完毕");
                     service.mNtfSys.notifyNotification(service, "发送完毕", "发送完毕");
                     break;
 
                 case BluetoothConstant.MESSAGE_FINISH_ACCEPT_NOTIFICATION:
-                    ToastUtil.toast(service, "接收完毕");
+                    ToastUtil.toast("接收完毕");
                     service.mNtfSys.notifyNotification(service, "接收完毕", "接收完毕");
                     break;
 
                 case BluetoothConstant.MESSAGE_UPDATE_SEND_NOTIFICATION:
                     service.mNtfSys.notifyNotification(service, NotificationSys.TITLE_SEND, (String) msg.obj);
+                    ;
                     break;
 
                 case BluetoothConstant.MESSAGE_UPDATE_ACCEPT_NOTIFICATION:

@@ -14,6 +14,7 @@ import com.test.yysleep.bluttoothtransmission.tool.sys.PermissionSys;
 import com.test.yysleep.bluttoothtransmission.ui.bluetooth.BlueToothActivity;
 import com.test.yysleep.bluttoothtransmission.util.FileLogUtil;
 import com.test.yysleep.bluttoothtransmission.util.LogUtil;
+import com.test.yysleep.bluttoothtransmission.util.ToastUtil;
 
 
 /**
@@ -54,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
 
             case R.id.main_test_service_btn:
                 LogUtil.d(TAG, "[onMainClick] test");
+                ToastUtil.toast("onMainClick");
                 break;
 
             default:
