@@ -90,11 +90,11 @@ public class BluetoothTransportService extends Service {
                     break;
 
                 case BluetoothConstant.MESSAGE_UPDATE_SEND_NOTIFICATION:
-                    service.mNtfSys.notifyNotification(service, NotificationSys.TITLE_SEND, (int) msg.obj + "%");
+                    service.mNtfSys.notifyNotification(service, NotificationSys.TITLE_SEND, (String) msg.obj);
                     break;
 
                 case BluetoothConstant.MESSAGE_UPDATE_ACCEPT_NOTIFICATION:
-                    service.mNtfSys.notifyNotification(service, NotificationSys.TITLE_ACCEPT, (int) msg.obj + "%");
+                    service.mNtfSys.notifyNotification(service, NotificationSys.TITLE_ACCEPT, (String) msg.obj);
                     break;
 
                 default:

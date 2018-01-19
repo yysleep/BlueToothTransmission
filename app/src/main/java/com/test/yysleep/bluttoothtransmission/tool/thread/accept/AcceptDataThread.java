@@ -66,17 +66,16 @@ public class AcceptDataThread extends Thread {
             // If a connection was accepted
             if (BluetoothSys.getInstance().getTransportFiles().size() == 0) {
                 acceptDataInfo(socket);
-            } else {
                 acceptFile(socket);
             }
 
-            if (socket != null) {
+            /*if (socket != null) {
                 try {
                     socket.close();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-            }
+            }*/
         }
     }
 
@@ -122,7 +121,7 @@ public class AcceptDataThread extends Thread {
                 files.add(info);
                 LogUtil.d(TAG, "[acceptDataInfo] path = " + array[i]);
             }
-            replyState(out);
+            replyState(out, BluetoothConstant.FLAG_ACCEPT_FILE_INFO_SUCCESS);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -155,6 +154,7 @@ public class AcceptDataThread extends Thread {
         LogUtil.d(TAG, "[acceptFile] 开始接受文件");
         BufferedInputStream buffIn = null;
         BufferedOutputStream buffOut = null;
+        int fileNum = 1;
         for (FileInfo info : list) {
             try {
                 long fileSize = info.getLength();
@@ -167,38 +167,31 @@ public class AcceptDataThread extends Thread {
                     buffOut.write(bytes, 0, len);
                     if (fileSize >= 0) {
                         acceptSize = len + acceptSize;
-                        sendMessage(BluetoothConstant.MESSAGE_UPDATE_ACCEPT_NOTIFICATION, acceptSize, fileSize);
+
+                        sendMessage(BluetoothConstant.MESSAGE_UPDATE_ACCEPT_NOTIFICATION, "第" + fileNum + "个文件 ：" + (int) ((float) 100 * acceptSize / fileSize) + "%");
                     }
                     LogUtil.d(TAG, "[acceptFile] fileSize");
                     buffOut.flush();
                     if (acceptSize >= fileSize)
                         break;
                 }
-                buffOut.flush();
+                fileNum++;
+                buffOut.close();
+
                 buffOut = new BufferedOutputStream(socket.getOutputStream());
-                replyState(buffOut);
-                mHandler.sendEmptyMessageDelayed(BluetoothConstant.MESSAGE_FINISH_ACCEPT_NOTIFICATION, 1000);
+                replyState(buffOut, BluetoothConstant.FLAG_ACCEPT_FILE_SUCCESS);
             } catch (IOException e) {
                 e.printStackTrace();
-
-                if (buffOut != null) {
-                    try {
-                        buffOut.close();
-                    } catch (IOException e0) {
-                        e0.printStackTrace();
-                    }
-                }
-            } finally {
-
                 if (buffIn != null) {
                     try {
                         buffIn.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
                     }
                 }
             }
         }
+        mHandler.sendEmptyMessageDelayed(BluetoothConstant.MESSAGE_FINISH_ACCEPT_NOTIFICATION, 1000);
         LogUtil.d(TAG, "[acceptFile] 文件接受完毕");
         try {
             Thread.sleep(200);
@@ -211,17 +204,16 @@ public class AcceptDataThread extends Thread {
         BluetoothSys.getInstance().clearTransportFiles();
     }
 
-    private void replyState(OutputStream out) throws IOException {
-        byte[] b = new byte[1];
-        b[0] = 1;
+    private void replyState(OutputStream out, String flag) throws IOException {
+        byte[] b = flag.getBytes();
         out.write(b);
         out.flush();
     }
 
-    private void sendMessage(int what, long acceptSize, long fileSize) {
+    private void sendMessage(int what, String content) {
         Message msg = Message.obtain();
         msg.what = what;
-        msg.obj = (int) ((float) 100 * acceptSize / fileSize);
+        msg.obj = content;
         LogUtil.d(TAG, "[sendMessage] progress = " + msg.obj);
         mHandler.sendMessage(msg);
     }

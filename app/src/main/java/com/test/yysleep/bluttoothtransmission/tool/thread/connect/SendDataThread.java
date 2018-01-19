@@ -15,6 +15,8 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,7 +46,6 @@ public class SendDataThread extends Thread {
             mSocket.connect();
             sendFileInfo();
             transportFile();
-            mHandler.sendEmptyMessageDelayed(BluetoothConstant.MESSAGE_FINISH_SEND_NOTIFICATION, 1000);
         } catch (IOException connectException) {
             try {
                 mSocket.close();
@@ -59,11 +60,16 @@ public class SendDataThread extends Thread {
         if (mSocket == null) {
             return;
         }
-        LogUtil.d(TAG, "[transportFile] 开始发送文件信息");
-        BufferedOutputStream buffOut = null;
+        LogUtil.d(TAG, "[sendFileInfo] 开始发送文件信息");
+        BufferedOutputStream out = null;
+        BufferedInputStream in = null;
         // Todo
         List<String> mCheckedFilePaths = new ArrayList<>();
         mCheckedFilePaths.add(Constant.PATH_01);
+        mCheckedFilePaths.add(Constant.PATH_02);
+        mCheckedFilePaths.add(Constant.PATH_03);
+        mCheckedFilePaths.add(Constant.PATH_04);
+        mCheckedFilePaths.add(Constant.PATH_05);
 
         BluetoothSys.getInstance().clearTransportFiles();
         List<FileInfo> mFileList = BluetoothSys.getInstance().getTransportFiles();
@@ -86,24 +92,31 @@ public class SendDataThread extends Thread {
             return;
         }
         try {
-            buffOut = new BufferedOutputStream(mSocket.getOutputStream());
-            buffOut.write(bytes, 0, bytes.length);
-            buffOut.flush();
-            LogUtil.d(TAG, "[transportFile] 发送文件信息结束");
+            out = new BufferedOutputStream(mSocket.getOutputStream());
+            out.write(bytes, 0, bytes.length);
+            out.flush();
+            LogUtil.d(TAG, "[sendFileInfo] 发送文件信息结束");
 
-            mSocket.connect();
-            /*InputStream inputStream = new BufferedInputStream(mSocket.getInputStream());
-            int l = inputStream.read(new byte[100]);*/
-            LogUtil.d(TAG, "[transportFile] 收到回传消息 ");
+            in = new BufferedInputStream(mSocket.getInputStream());
+            boolean acceptFileInfoState = acceptState(in, BluetoothConstant.FLAG_ACCEPT_FILE_INFO_SUCCESS);
+            LogUtil.d(TAG, "[sendFileInfo] 发送文件信息结束 acceptFileInfoState = " + acceptFileInfoState);
 
 
         } catch (IOException exception) {
             exception.printStackTrace();
-            if (buffOut != null) {
+            if (out != null) {
                 try {
-                    buffOut.close();
+                    out.close();
                 } catch (IOException e) {
                     e.printStackTrace();
+                }
+            }
+
+            if (in != null) {
+                try {
+                    in.close();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
                 }
             }
         }
@@ -120,6 +133,7 @@ public class SendDataThread extends Thread {
         LogUtil.d(TAG, "[transportFile] 开始发送文件");
         BufferedInputStream in = null;
         BufferedOutputStream out = null;
+        int fileNum = 1;
         for (FileInfo info : mFileList) {
             File file = new File(info.getPath());
             if (!file.exists()) {
@@ -138,14 +152,18 @@ public class SendDataThread extends Thread {
                     out.flush();
                     if (fileSize > 0) {
                         sendSize = len + sendSize;
-                        sendMessage(BluetoothConstant.MESSAGE_UPDATE_SEND_NOTIFICATION, sendSize, fileSize);
+                        sendMessage(BluetoothConstant.MESSAGE_UPDATE_SEND_NOTIFICATION, "第" + fileNum + "个文件 ：" + (int) ((float) 100 * sendSize / fileSize) + "%");
                     }
                     if (sendSize >= fileSize)
                         break;
                 }
+                fileNum++;
+                in.close();
 
-                mSocket.connect();
-                LogUtil.d(TAG, "[transportFile] 继续下个文件");
+
+                in = new BufferedInputStream(mSocket.getInputStream());
+                boolean acceptFileState = acceptState(in, BluetoothConstant.FLAG_ACCEPT_FILE_SUCCESS);
+                LogUtil.d(TAG, "[transportFile] 继续下个文件 acceptFileState = " + acceptFileState);
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -156,24 +174,22 @@ public class SendDataThread extends Thread {
                         e1.printStackTrace();
                     }
                 }
-            } finally {
-                if (in != null) {
-                    try {
-                        in.close();
-                    } catch (IOException e1) {
-                        e1.printStackTrace();
-                    }
-                }
             }
         }
-
+        mHandler.sendEmptyMessageDelayed(BluetoothConstant.MESSAGE_FINISH_SEND_NOTIFICATION, 1000);
         LogUtil.d(TAG, "[transportFile] 发送文件结束");
     }
 
-    private void sendMessage(int what, long sendSize, long fileSize) {
+    private void sendMessage(int what, String content) {
         Message msg = Message.obtain();
         msg.what = what;
-        msg.obj = (int) ((float) 100 * sendSize / fileSize);
+        msg.obj = content;
         mHandler.sendMessage(msg);
+    }
+
+    private boolean acceptState(InputStream in, String flag) throws IOException {
+        byte[] b = new byte[flag.getBytes().length];
+        int len = in.read(b);
+        return flag.equals(new String(b));
     }
 }

@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
                 break;
 
             case R.id.main_test_service_btn:
-
+                LogUtil.d(TAG, "[onMainClick] test");
                 break;
 
             default:

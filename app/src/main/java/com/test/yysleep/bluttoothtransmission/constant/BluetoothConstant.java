@@ -27,5 +27,9 @@ public class BluetoothConstant {
     public final static int MESSAGE_UPDATE_ACCEPT_NOTIFICATION = 502;
     public final static int MESSAGE_FINISH_ACCEPT_NOTIFICATION = 503;
 
+    public final static String FLAG_ACCEPT_FILE_INFO_SUCCESS = "accept_file_info_success";
+
+    public final static String FLAG_ACCEPT_FILE_SUCCESS = "accept_file_success";
+
 
 }
