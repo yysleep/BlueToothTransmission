@@ -96,11 +96,17 @@ public class BluetoothTransportService extends Service {
 
                 case BluetoothConstant.MESSAGE_UPDATE_SEND_NOTIFICATION:
                     service.mNtfSys.notifyNotification(service, NotificationSys.TITLE_SEND, (String) msg.obj);
-                    ;
                     break;
 
                 case BluetoothConstant.MESSAGE_UPDATE_ACCEPT_NOTIFICATION:
                     service.mNtfSys.notifyNotification(service, NotificationSys.TITLE_ACCEPT, (String) msg.obj);
+                    break;
+
+                case BluetoothConstant.MESSAGE_BLUETOOTH_SERVER_SOCKET_FAILED:
+                    if (service.mManager != null) {
+                        service.mManager.cancelAccept();
+                        service.mManager.executeAccept();
+                    }
                     break;
 
                 default:

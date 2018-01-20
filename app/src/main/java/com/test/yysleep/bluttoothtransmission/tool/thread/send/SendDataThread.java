@@ -6,7 +6,6 @@ import android.os.Message;
 
 import com.test.yysleep.bluttoothtransmission.constant.BluetoothConstant;
 import com.test.yysleep.bluttoothtransmission.constant.Constant;
-import com.test.yysleep.bluttoothtransmission.model.FileInfo;
 import com.test.yysleep.bluttoothtransmission.tool.sys.BluetoothSys;
 import com.test.yysleep.bluttoothtransmission.util.LogUtil;
 import com.test.yysleep.bluttoothtransmission.util.ToastUtil;
@@ -17,7 +16,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -30,7 +28,6 @@ import java.util.List;
 public class SendDataThread extends Thread {
 
     private final static String TAG = "SendDataThread";
-    private final static long FINISH = 1;
     private final BluetoothSocket mSocket;
     private Handler mHandler;
 
@@ -53,6 +50,7 @@ public class SendDataThread extends Thread {
             transportFile();
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
+            ToastUtil.toast("蓝牙连接异常，请检查双方设备的蓝牙状态");
         } finally {
             try {
                 if (mSocket != null)
@@ -83,9 +81,8 @@ public class SendDataThread extends Thread {
         StringBuilder builder = new StringBuilder();
         ToastUtil.toast("开始传输文件信息");
         Iterator<String> itr = filePaths.iterator();
-        String path = null;
         while (itr.hasNext()) {
-            path = itr.next();
+            String path = itr.next();
             File file = new File(path);
             if (file.exists()) {
                 long length = file.length();
@@ -138,11 +135,8 @@ public class SendDataThread extends Thread {
         if (mSocket == null) {
             return;
         }
-
         List<String> mFileList = BluetoothSys.getInstance().getSendFilePaths();
-
         LogUtil.d(TAG, "[transportFile] 开始发送文件");
-        BufferedInputStream in = null;
         BufferedOutputStream out = null;
         int fileNum = 1;
         for (String path : mFileList) {
@@ -156,7 +150,7 @@ public class SendDataThread extends Thread {
             try {
                 byte[] bytes = new byte[1024];
                 int len = 0;
-                in = new BufferedInputStream(new FileInputStream(file));
+                BufferedInputStream in = new BufferedInputStream(new FileInputStream(file));
                 out = new BufferedOutputStream(mSocket.getOutputStream());
                 ToastUtil.toast("正在发送第 " + fileNum + " 个文件");
                 while ((len = in.read(bytes)) != -1) {
@@ -171,7 +165,6 @@ public class SendDataThread extends Thread {
                 }
                 fileNum++;
                 in.close();
-
 
                 in = new BufferedInputStream(mSocket.getInputStream());
                 boolean acceptFileState = acceptState(in, BluetoothConstant.FLAG_ACCEPT_FILE_SUCCESS);

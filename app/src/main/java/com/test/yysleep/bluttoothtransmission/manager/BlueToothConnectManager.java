@@ -36,6 +36,7 @@ public class BlueToothConnectManager extends Thread {
         if (mAcceptThread != null) {
             mAcceptThread.cancel();
         }
+        mAcceptThread = null;
     }
 
     public void cancelSend() {

@@ -22,6 +22,8 @@ public class BluetoothConstant {
 
     public final static String EXTRA_TRANSPORT_SEND_SERVICE = "send_job";
 
+    public final static int MESSAGE_BLUETOOTH_SERVER_SOCKET_FAILED = 403;
+
     public final static int MESSAGE_UPDATE_SEND_NOTIFICATION = 500;
     public final static int MESSAGE_FINISH_SEND_NOTIFICATION = 501;
     public final static int MESSAGE_UPDATE_ACCEPT_NOTIFICATION = 502;
@@ -30,6 +32,8 @@ public class BluetoothConstant {
     public final static String FLAG_ACCEPT_FILE_INFO_SUCCESS = "accept_file_info_success";
 
     public final static String FLAG_ACCEPT_FILE_SUCCESS = "accept_file_success";
+
+
 
 
 }

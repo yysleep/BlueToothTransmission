@@ -50,8 +50,10 @@ public class AcceptDataThread extends Thread {
 
     public void run() {
         LogUtil.d(TAG, "[run] mServerSocket = " + mServerSocket);
-        if (mServerSocket == null)
+        if (mServerSocket == null) {
+            mHandler.sendEmptyMessage(BluetoothConstant.MESSAGE_BLUETOOTH_SERVER_SOCKET_FAILED);
             return;
+        }
 
         mSocket = null;
         // Keep listening until exception occurs or a socket is returned
@@ -66,8 +68,9 @@ public class AcceptDataThread extends Thread {
                 try {
                     LogUtil.d(TAG, "[run] 开始一轮新的等待");
                     mSocket = mServerSocket.accept();
+                    ToastUtil.toast("开始接收数据");
                 } catch (IOException e) {
-                    ToastUtil.toast("蓝牙通道异常关闭");
+                    ToastUtil.toast("蓝牙通道出现异常");
                     break;
                 }
 
